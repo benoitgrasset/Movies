@@ -17,7 +17,12 @@ export const useStyles = makeStyles((theme: Theme) => {
         buttonContainer: {
             "&>*": {
                 margin: theme.spacing(1)
-            },
+            }
+        },
+        stepper: {
+            display: 'flex',
+            flexDirection: "column",
+            alignItems: "center",
             marginLeft: theme.spacing(2)
         },
         inputLabel: {
