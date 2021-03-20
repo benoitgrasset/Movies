@@ -28,7 +28,8 @@ const App: React.FunctionComponent<{}> = () => {
   const [category, setCategory] = React.useState(ALL)
   const [page, setPage] = React.useState(firstPage)
   const [nbElements, setNbElements] = React.useState(elements[1])
-  const nbPages = Math.ceil(movies.length / nbElements)
+  const nbMovies = movies.length
+  const nbPages = Math.ceil(nbMovies / nbElements)
 
   const handleChangeCategory = (event: React.ChangeEvent<{ value: unknown }>) => {
     setCategory(event.target.value as string)
@@ -37,12 +38,12 @@ const App: React.FunctionComponent<{}> = () => {
   const handleChangeElements = (event: React.ChangeEvent<{ value: unknown }>) => {
     const nbElements = event.target.value as number
     setNbElements(nbElements)
-    const nbPages = Math.ceil(movies.length / nbElements)
+    const nbPages = Math.ceil(nbMovies / nbElements)
     setPage(prevState => prevState >= nbPages ? nbPages : prevState)
   }
 
   const firstElementIndex = (page - 1) * nbElements
-  const lastElementIndex = page * nbElements
+  const lastElementIndex = page * nbElements > nbMovies ? nbMovies : page * nbElements
 
   const visibleMovies = movies.filter(movie => category === ALL || movie.category === category)
     .slice(firstElementIndex, lastElementIndex)
@@ -86,7 +87,7 @@ const App: React.FunctionComponent<{}> = () => {
               {page}
               <IconButton onClick={handleNext}><KeyboardArrowRight /></IconButton>
             </div>
-            <div>{`${firstElementIndex + 1}-${lastElementIndex} of ${movies.length}`}</div>
+            <div>{`${firstElementIndex + 1}-${lastElementIndex} of ${nbMovies}`}</div>
           </div>
         </div>
       </div>
