@@ -22,8 +22,7 @@ export const useStyles = makeStyles((theme: Theme) => {
         stepper: {
             display: 'flex',
             flexDirection: "column",
-            alignItems: "center",
-            marginLeft: theme.spacing(2)
+            alignItems: "center"
         },
         inputLabel: {
             minWidth: 150

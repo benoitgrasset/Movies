@@ -28,25 +28,33 @@ const App: React.FunctionComponent<{}> = () => {
   const [category, setCategory] = React.useState(ALL)
   const [page, setPage] = React.useState(firstPage)
   const [nbElements, setNbElements] = React.useState(elements[1])
-  const nbMovies = movies.length
-  const nbPages = Math.ceil(nbMovies / nbElements)
+
+  const filteredMovies = movies.filter(movie => category === ALL || movie.category === category)
+  const nbMovies = filteredMovies.length
+
+  const updateCurrentPage = (nbMovies: number, nbElements: number) => {
+    const nbPages = Math.ceil(nbMovies / nbElements)
+    setPage(prevState => prevState >= nbPages ? nbPages : prevState)
+  }
 
   const handleChangeCategory = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setCategory(event.target.value as string)
+    const category = event.target.value as string
+    setCategory(category)
+    const nbMovies = movies.filter(movie => category === ALL || movie.category === category).length
+    updateCurrentPage(nbMovies, nbElements)
   }
 
   const handleChangeElements = (event: React.ChangeEvent<{ value: unknown }>) => {
     const nbElements = event.target.value as number
     setNbElements(nbElements)
-    const nbPages = Math.ceil(nbMovies / nbElements)
-    setPage(prevState => prevState >= nbPages ? nbPages : prevState)
+    updateCurrentPage(nbMovies, nbElements)
   }
 
   const firstElementIndex = (page - 1) * nbElements
-  const lastElementIndex = page * nbElements > nbMovies ? nbMovies : page * nbElements
+  const maxLastElementIndex = page * nbElements
+  const lastElementIndex = maxLastElementIndex > nbMovies ? nbMovies : maxLastElementIndex
 
-  const visibleMovies = movies.filter(movie => category === ALL || movie.category === category)
-    .slice(firstElementIndex, lastElementIndex)
+  const visibleMovies = filteredMovies.slice(firstElementIndex, lastElementIndex)
 
   const onDelete = (id: string) => {
     setMovies(prevState => prevState.filter(movie => movie.id !== id))
@@ -56,6 +64,7 @@ const App: React.FunctionComponent<{}> = () => {
     setPage(prevState => prevState <= firstPage ? firstPage : prevState - 1)
   }
   const handleNext = () => {
+    const nbPages = Math.ceil(nbMovies / nbElements)
     setPage(prevState => prevState >= nbPages ? nbPages : prevState + 1)
   }
 

@@ -42,7 +42,6 @@ const Card: React.FunctionComponent<CardProps> = (props) => {
             />
             <CardContent>
                 <p>{`Category: ${category}`}</p>
-                <p>{`Id: ${id}`}</p>
                 <div className={classes.likeButton}>
                     <Tooltip title={isLiked ? "Like" : "Dislike"}>
                         <IconButton onClick={handleLike}>
