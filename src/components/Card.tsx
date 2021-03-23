@@ -7,6 +7,28 @@ import { useStyles } from "./Card_style"
 import { MovieWithLike } from '../redux'
 
 
+const getColor = (isLiked?: boolean) => {
+    switch (isLiked) {
+        case true:
+            return "primary"
+        case false:
+            return "secondary"
+        default:
+            return "inherit"
+    }
+}
+
+const getTooltip = (isLiked?: boolean) => {
+    switch (isLiked) {
+        case true:
+            return "Like"
+        case false:
+            return "Dislike"
+        default:
+            return ""
+    }
+}
+
 interface CardProps extends MovieWithLike {
     onDelete: (id: string) => void
     handleLike: (id: string) => void
@@ -20,17 +42,6 @@ const Card: React.FunctionComponent<CardProps> = (props) => {
 
     const nbLikes = isLiked ? likes + 1 : likes
     const nbDislikes = (isLiked || isLiked === undefined) ? dislikes : dislikes + 1
-
-    const getColor = () => {
-        switch (isLiked) {
-            case true:
-                return "primary"
-            case false:
-                return "secondary"
-            default:
-                return "inherit"
-        }
-    }
 
     return (
         <MUICard className={classes.card}>
@@ -48,9 +59,9 @@ const Card: React.FunctionComponent<CardProps> = (props) => {
             <CardContent>
                 <p>{`Category: ${category}`}</p>
                 <div className={classes.likeButton}>
-                    <Tooltip title={isLiked ? "Like" : "Dislike"}>
+                    <Tooltip title={getTooltip(isLiked)}>
                         <IconButton onClick={() => handleLike(id)}>
-                            <ThumbUp color={getColor()} />
+                            <ThumbUp color={getColor(isLiked)} />
                         </IconButton>
                     </Tooltip>
                 </div>
