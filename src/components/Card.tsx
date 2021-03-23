@@ -1,31 +1,36 @@
 import React from 'react'
 import { Card as MUICard, CardHeader, CardContent, IconButton, Tooltip } from "@material-ui/core"
 import { ThumbUp, Close } from "@material-ui/icons"
-import { Movie } from "../movies"
 import ProgressBar from "./ProgressBar"
 import { useStyles } from "./Card_style"
 
+import { MovieWithLike } from '../redux'
 
-interface CardProps extends Movie {
+
+interface CardProps extends MovieWithLike {
     onDelete: (id: string) => void
+    handleLike: (id: string) => void
 }
 
 const Card: React.FunctionComponent<CardProps> = (props) => {
 
-    const { title, category, likes, dislikes, onDelete, id } = props
+    const { title, category, likes, dislikes, onDelete, id, like: isLiked, handleLike } = props
 
     const classes = useStyles()
 
-    const [isLiked, setIsliked] = React.useState(true)
-
     const nbLikes = isLiked ? likes + 1 : likes
-    const nbDislikes = isLiked ? dislikes : dislikes + 1
+    const nbDislikes = (isLiked || isLiked === undefined) ? dislikes : dislikes + 1
 
-    const handleLike = () => {
-        setIsliked(prevState => !prevState)
+    const getColor = () => {
+        switch (isLiked) {
+            case true:
+                return "primary"
+            case false:
+                return "secondary"
+            default:
+                return "inherit"
+        }
     }
-
-    const color = isLiked ? "primary" : "secondary"
 
     return (
         <MUICard className={classes.card}>
@@ -44,8 +49,8 @@ const Card: React.FunctionComponent<CardProps> = (props) => {
                 <p>{`Category: ${category}`}</p>
                 <div className={classes.likeButton}>
                     <Tooltip title={isLiked ? "Like" : "Dislike"}>
-                        <IconButton onClick={handleLike}>
-                            <ThumbUp color={color} />
+                        <IconButton onClick={() => handleLike(id)}>
+                            <ThumbUp color={getColor()} />
                         </IconButton>
                     </Tooltip>
                 </div>

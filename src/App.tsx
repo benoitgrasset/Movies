@@ -1,22 +1,31 @@
 import React from 'react'
-import { movies$, Movie } from "./movies"
-import Card from "./components/Card"
+import { useDispatch, useSelector } from "react-redux"
+import {
+  selectMovies, fetchMovies, deleteMovie, next, previous, selectCurrentPage,
+  selectNbElements, changeElements, firstPage, selectCategory, changeCategory,
+  toggleLike
+} from "./redux"
+import { Card } from "./components"
 import { Select, MenuItem, FormControl, InputLabel, IconButton } from "@material-ui/core"
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@material-ui/icons";
 import { useStyles } from "./index_style"
 
 
-const ALL = "All"
-const elements = [4, 8, 12]
-const firstPage = 1
+export const elements = [4, 8, 12]
+export const ALL = "All"
 
 const App: React.FunctionComponent<{}> = () => {
 
-  const [movies, setMovies] = React.useState<Array<Movie>>([])
+  const dispatch = useDispatch()
 
   React.useEffect(() => {
-    movies$.then((res: Movie[]) => setMovies(res))
-  }, [setMovies])
+    dispatch(fetchMovies())
+  }, [dispatch])
+
+  const movies = useSelector(selectMovies)
+  const currentPage = useSelector(selectCurrentPage)
+  const nbElements = useSelector(selectNbElements)
+  const category = useSelector(selectCategory)
 
   const categories = movies.reduce((acc, movie) => {
     if (!acc.includes(movie.category)) {
@@ -25,47 +34,45 @@ const App: React.FunctionComponent<{}> = () => {
     else return acc
   }, [ALL])
 
-  const [category, setCategory] = React.useState(ALL)
-  const [page, setPage] = React.useState(firstPage)
-  const [nbElements, setNbElements] = React.useState(elements[1])
-
   const filteredMovies = movies.filter(movie => category === ALL || movie.category === category)
   const nbMovies = filteredMovies.length
+  const nbPages = Math.ceil(nbMovies / nbElements)
 
-  const updateCurrentPage = (nbMovies: number, nbElements: number) => {
-    const nbPages = Math.ceil(nbMovies / nbElements)
-    setPage(prevState => prevState >= nbPages ? nbPages : prevState)
-  }
+  // const updateCurrentPage = (nbMovies: number, nbElements: number) => {
+  // const nbPages = Math.ceil(nbMovies / nbElements)
+  // setPage(prevState => prevState >= nbPages ? nbPages : prevState)
+  // }
 
   const handleChangeCategory = (event: React.ChangeEvent<{ value: unknown }>) => {
     const category = event.target.value as string
-    setCategory(category)
-    const nbMovies = movies.filter(movie => category === ALL || movie.category === category).length
-    updateCurrentPage(nbMovies, nbElements)
+    dispatch(changeCategory({ category }))
+    // const nbMovies = movies.filter(movie => category === ALL || movie.category === category).length
   }
 
   const handleChangeElements = (event: React.ChangeEvent<{ value: unknown }>) => {
     const nbElements = event.target.value as number
-    setNbElements(nbElements)
-    updateCurrentPage(nbMovies, nbElements)
+    dispatch(changeElements({ nbElements }))
   }
 
-  const firstElementIndex = (page - 1) * nbElements
-  const maxLastElementIndex = page * nbElements
+  const firstElementIndex = (currentPage - 1) * nbElements
+  const maxLastElementIndex = currentPage * nbElements
   const lastElementIndex = maxLastElementIndex > nbMovies ? nbMovies : maxLastElementIndex
 
   const visibleMovies = filteredMovies.slice(firstElementIndex, lastElementIndex)
 
   const onDelete = (id: string) => {
-    setMovies(prevState => prevState.filter(movie => movie.id !== id))
+    dispatch(deleteMovie({ id }))
   }
 
   const handlePrevious = () => {
-    setPage(prevState => prevState <= firstPage ? firstPage : prevState - 1)
+    currentPage > firstPage && dispatch(previous())
   }
   const handleNext = () => {
-    const nbPages = Math.ceil(nbMovies / nbElements)
-    setPage(prevState => prevState >= nbPages ? nbPages : prevState + 1)
+    currentPage < nbPages && dispatch(next())
+  }
+
+  const handleLike = (id: string) => {
+    dispatch(toggleLike({ id }))
   }
 
   const classes = useStyles()
@@ -74,7 +81,7 @@ const App: React.FunctionComponent<{}> = () => {
     <>
       <div className={classes.header}>
         <FormControl className={classes.formControl}>
-          <InputLabel className={classes.inputLabel}>Category</InputLabel>
+          <InputLabel className={classes.inputLabel}>{"Category"}</InputLabel>
           <Select value={category}
             onChange={handleChangeCategory}
           >
@@ -83,7 +90,7 @@ const App: React.FunctionComponent<{}> = () => {
         </FormControl>
         <div className={classes.pagination}>
           <FormControl className={classes.formControl}>
-            <InputLabel className={classes.inputLabel}>Elements per page</InputLabel>
+            <InputLabel className={classes.inputLabel}>{"Elements per page"}</InputLabel>
             <Select value={nbElements}
               onChange={handleChangeElements}
             >
@@ -93,7 +100,7 @@ const App: React.FunctionComponent<{}> = () => {
           <div className={classes.stepper}>
             <div className={classes.buttonContainer}>
               <IconButton onClick={handlePrevious}><KeyboardArrowLeft /></IconButton>
-              {page}
+              {currentPage}
               <IconButton onClick={handleNext}><KeyboardArrowRight /></IconButton>
             </div>
             <div>{`${firstElementIndex + 1}-${lastElementIndex} of ${nbMovies}`}</div>
@@ -102,7 +109,7 @@ const App: React.FunctionComponent<{}> = () => {
       </div>
       <div className={classes.root}>
         <div className={classes.container}>
-          {visibleMovies.map(movie => <Card key={movie.id} {...movie} onDelete={onDelete} />)}
+          {visibleMovies.map(movie => <Card key={movie.id} {...movie} onDelete={onDelete} handleLike={handleLike} />)}
         </div>
       </div>
     </>
