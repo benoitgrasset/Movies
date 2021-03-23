@@ -38,15 +38,11 @@ const App: React.FunctionComponent<{}> = () => {
   const nbMovies = filteredMovies.length
   const nbPages = Math.ceil(nbMovies / nbElements)
 
-  // const updateCurrentPage = (nbMovies: number, nbElements: number) => {
-  // const nbPages = Math.ceil(nbMovies / nbElements)
-  // setPage(prevState => prevState >= nbPages ? nbPages : prevState)
-  // }
-
   const handleChangeCategory = (event: React.ChangeEvent<{ value: unknown }>) => {
     const category = event.target.value as string
     dispatch(changeCategory({ category }))
-    // const nbMovies = movies.filter(movie => category === ALL || movie.category === category).length
+    const nbMovies = movies.filter(movie => category === ALL || movie.category === category).length
+    dispatch(changeElements({ nbElements, nbMovies }))
   }
 
   const handleChangeElements = (event: React.ChangeEvent<{ value: unknown }>) => {
