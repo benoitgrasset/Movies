@@ -51,7 +51,7 @@ const App: React.FunctionComponent<{}> = () => {
 
   const handleChangeElements = (event: React.ChangeEvent<{ value: unknown }>) => {
     const nbElements = event.target.value as number
-    dispatch(changeElements({ nbElements }))
+    dispatch(changeElements({ nbElements, nbMovies }))
   }
 
   const firstElementIndex = (currentPage - 1) * nbElements

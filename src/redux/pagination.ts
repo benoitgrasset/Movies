@@ -21,7 +21,10 @@ const paginationSlice = createSlice({
             state.currentPage += 1
         },
         changeElements: (state, action) => {
-            state.nbElements = action.payload.nbElements
+            const { nbMovies, nbElements } = action.payload
+            state.nbElements = nbElements
+            const nbPages = Math.ceil(nbMovies / nbElements)
+            state.currentPage = state.currentPage >= nbPages ? nbPages : state.currentPage
         }
     },
     extraReducers: {
