@@ -1,3 +1,4 @@
+This application has been deployed here:
 https://benoitgrasset.github.io/movies/
 
 # Getting Started with Create React App
